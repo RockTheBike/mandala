@@ -405,8 +405,27 @@ long     vertexSweep() {
   return 6000; // the number of milliseconds this routine is supposed to end at
 }
 
-long     vertexSweepFast() {
-  return 10000; // the number of milliseconds this routine is supposed to end at  
+long     vertexSweepFast() { // Same as Vertex sweep but all delays are halved.
+  int stage = (progress / 300) % 13;  // this and one other line are the only
+  if (stage == 0) {
+    allOff();
+    digitalWrite(vertex1,HIGH);
+  }                            // changes from vertexSweep()
+  digitalWrite(beyondRelay,((progress / 300) / 13) & 1);
+
+  aw[ledPanels] = ledPanelsMedium; // LED panels on medium
+  if (stage > 0) digitalWrite(vertex2,HIGH);
+  if (stage > 1) digitalWrite(vertex3,HIGH);
+  if (stage > 2) digitalWrite(vertex4,HIGH);
+  if (stage > 3) digitalWrite(vertex5,HIGH);
+  if (stage > 4) digitalWrite(crissCross,HIGH);
+  if (stage > 6) digitalWrite(crissCross,LOW);
+  if (stage > 7) digitalWrite(vertex5,LOW);
+  if (stage > 8) digitalWrite(vertex4,LOW);
+  if (stage > 9) digitalWrite(vertex3,LOW);
+  if (stage > 10) digitalWrite(vertex2,LOW);
+  if (stage > 11) digitalWrite(vertex1,LOW);
+  return 6000; // the number of milliseconds this routine is supposed to end at
 }
 
 long     climacticBuild() {
