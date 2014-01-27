@@ -1,6 +1,7 @@
 // code for 12-point LED Mandala / Chobani
 
 #define powerInletsBrightness 64 // brightness value of Turn Power Inlets ON  Low. 
+#define ledPanelsLow 64 // brightness value of LED panels are on low
 
 // THESE ARE INDEX NUMBERS NOT PIN NUMBERS
 #define outerRelay  0
@@ -22,7 +23,7 @@
 
 //               0  1  2  3  4  5  6  7   8   9  10  11  12  13  14
 int pin[PINS] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, A1, A2, A3};
-int aw[PINS] = 0; // what analogWrite value to put
+int aw[PINS] = {0}; // what analogWrite value to put
 int oldAw[PINS] = {-1, -1, -1, -1, -1, -1, -1, -1, -1,  -1,  -1,  -1,  -1,  -1,  -1}; // last value
 
 
@@ -252,8 +253,6 @@ void entireSequence() {
     Serial.print(sequenceStage);
     break;
   }
-  
-
 }
 
 long slowRandomTriangleFade() {
@@ -264,7 +263,7 @@ long slowRandomTriangleFade() {
    a low-medium-low fade. This takes 2 s per triangle. Stagger
    them and begin them at random so that some are increasing and
    some are decreasing at the same time. */
-  digitalWrite(pin[ledPanels,LOW);
+  digitalWrite(pin[ledPanels],LOW);
 //  unsigned int triProgress = progress % 2000;
   if (progress < 2000) {
     int fade = progress / ( 800 / 64); // first 800ms is off to low
@@ -285,22 +284,20 @@ long oneTriangle() {
  LED panels are on low 
  Fade in Triangle 1 to full brightness over 300ms. Leave on for 600ms. Fade out over 300ms. Pause for 600ms.
  Repeat for Triangle 2, 3, 4. */
-  aw[ledPanels] = 64; //   LED panels are on low 
-  if (progress < 300) aw[triangle1] = (int)((float)progress / 1.178); // 0 to 255 at 300 progress milliseconds
-  if ((progress >= 300) && (progress < 900)) aw[triangle1] = 255;  // Leave on for 600ms.
-  
-  
-  
-  
-  
-  
-  
-  
-  if (progress < 256) analogWrite(triangle1,progress);
-  if ((progress >= 256) && (progress < 856)) digitalWrite(triangle1,HIGH);
-  if ((progress >= 856) && (progress < 1112)) analogWrite(triangle1,255 - (progress - 856));
-  if ((progress >= 1112) && (progress < 1112))
-  return 10000; // the number of milliseconds this routine is supposed to end at  
+  aw[ledPanels] = ledPanelsLow; //   LED panels are on low 
+  int whichTriangle;
+  if (progress < 1800) whichTriangle = triangle1;
+  if ((progress >= 1800) && (progress < 3600)) whichTriangle = triangle2;
+  if ((progress >= 3600) && (progress < 5400)) whichTriangle = triangle3;
+  if (progress >= 5400) whichTriangle = triangle4;
+  long triangleProgress = progress % 1800; // how far into this triangle are we
+
+  if (triangleProgress < 300) aw[whichTriangle] = (int)((float)triangleProgress / 1.178); // 0 to 255 at 300 triangleProgress milliseconds
+  if ((triangleProgress >= 300) && (triangleProgress < 900)) aw[whichTriangle] = 255;  // Leave on for 600ms.
+  if ((triangleProgress >= 900) && (triangleProgress < 1200)) aw[whichTriangle] = 255 - (int)((float)(triangleProgress - 900) / 1.178);  // Fade out over 300ms
+  if (triangleProgress >= 1200) aw[whichTriangle] = 0;  // Pause for 600ms.
+
+  return 1800*4; // the number of milliseconds this routine is supposed to end at  
 }
 
 long triangleBuild() {
