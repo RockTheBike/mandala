@@ -379,7 +379,30 @@ long innerOverlay() {
 }
 
 long     vertexSweep() {
-  return 10000; // the number of milliseconds this routine is supposed to end at  
+/* Turn Vertex1 ON, then Vertex2, 3, 4, 5, CrissCross, with 600ms delay
+ Leave all on for 1200ms
+ Then turn off in the reverse order: CrissCross, 5, 4, 3, 2, 1.
+ Beyond ON,   Repeat*/
+  int stage = (progress / 600) % 13;
+  if (stage == 0) {
+    allOff();
+    digitalWrite(vertex1,HIGH);
+  }
+  digitalWrite(beyondRelay,((progress / 600) / 13) & 1);
+
+  aw[ledPanels] = ledPanelsMedium; // LED panels on medium
+  if (stage > 0) digitalWrite(vertex2,HIGH);
+  if (stage > 1) digitalWrite(vertex3,HIGH);
+  if (stage > 2) digitalWrite(vertex4,HIGH);
+  if (stage > 3) digitalWrite(vertex5,HIGH);
+  if (stage > 4) digitalWrite(crissCross,HIGH);
+  if (stage > 6) digitalWrite(crissCross,LOW);
+  if (stage > 7) digitalWrite(vertex5,LOW);
+  if (stage > 8) digitalWrite(vertex4,LOW);
+  if (stage > 9) digitalWrite(vertex3,LOW);
+  if (stage > 10) digitalWrite(vertex2,LOW);
+  if (stage > 11) digitalWrite(vertex1,LOW);
+  return 6000; // the number of milliseconds this routine is supposed to end at
 }
 
 long     vertexSweepFast() {
