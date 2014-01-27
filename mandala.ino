@@ -67,7 +67,12 @@ void loop() {
   knobMode = knobValue / 103;  // knobMode will be 0 through 9
   if (knobMode != oldKnobMode) {  // if we have changed modes from last time
     Serial.print("switched to mode "); // Debug CODE:  Please print out to the
-    Serial.println(knobMode); // Serial monitor what Light Function is currently running
+    Serial.print(knobMode); // Serial monitor what Light Function is currently running
+    Serial.print(" (");
+    Serial.print(knobValue);
+    Serial.print(" ");
+    Serial.print(knobAdder);
+    Serial.println(")");    
     oldKnobMode = knobMode;
     startTime = timeNow; // start a new sequence
     sequenceStage = 0; // make sure we start sequence at the beginning if applicable
