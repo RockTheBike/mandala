@@ -429,7 +429,99 @@ long     vertexSweepFast() { // Same as Vertex sweep but all delays are halved.
 }
 
 long     climacticBuild() {
-  return 10000000; // the number of milliseconds this routine is supposed to end at
+  /*TriangleBuildFast();
+   All LED Panels on medium;
+   InnerOverlay();
+   All LED Panels ON bright;
+   OuterRelay ON
+   Beyond ON
+
+   VertexSweepFast();
+   All lights ON.
+   Outer Relay OFF
+   Outer Relay ON  Delay 300
+   Outer Relay OFF Delay 300
+   Outer Relay ON. Delay 300
+   Outer Relay OFF. Delay 300
+
+   Outer Relay ON
+
+   Turn off pins in the following order with a 300ms delay
+   CrissCross
+   Vertex 5, 4, 3, 2, 1
+   Beyond OFF
+   Outer Relay OFF
+   LED panels OFF
+   Finale Lights ON (VJ needs to flip physical switch)
+   SlowRandomTriangleFade();  (stays on indefinitely)
+   */
+  if (sequenceStage == 0) {
+    if (progress > triangleBuildFast()) {
+      sequenceStage++;
+      startTime = timeNow;
+    }
+  }
+  if (sequenceStage == 1) {
+    if (progress > innerOverlay()) {
+      sequenceStage++;
+      startTime = timeNow;
+    }
+    aw[ledPanels] = ledPanelsMedium; // LED panels on medium
+  }
+  if (sequenceStage > 1) {
+    aw[ledPanels] = 255; // LED panels ON bright
+    digitalWrite(outerRelay,HIGH);
+    digitalWrite(beyondRelay,HIGH);
+  }
+  if (sequenceStage == 2) {
+    if (progress > vertexSweepFast()) {
+      sequenceStage++;
+      startTime = timeNow;
+    }
+  }
+  if (sequenceStage == 3) {
+    digitalWrite(pin[outerRelay],HIGH);
+    aw[triangle1] = 255;
+    digitalWrite(pin[vertex1],HIGH);
+    aw[triangle2] = 255;
+    aw[triangle3] = 255;
+    digitalWrite(pin[vertex2],HIGH);
+    digitalWrite(pin[vertex3],HIGH);
+    aw[triangle4] = 255;
+    aw[powerInlets] = 255;
+    aw[ledPanels] = 255;
+    digitalWrite(pin[vertex4],HIGH);
+    digitalWrite(pin[vertex5],HIGH);
+    digitalWrite(pin[crissCross],HIGH);
+    digitalWrite(pin[beyondRelay],(progress / 300) & 1); // off for 300ms, on for 300...
+    if (progress > 1800) {
+      sequenceStage++;
+      startTime = timeNow;
+    }
+    if (sequenceStage == 4) {
+      // Turn off pins in the following order with a 300ms delay
+      digitalWrite(crissCross,LOW);
+      int stage = (progress / 300);  // this and one other line are the only
+      if (stage > 0) digitalWrite(vertex5,LOW);
+      if (stage > 1) digitalWrite(vertex4,LOW);
+      if (stage > 2) digitalWrite(vertex3,LOW);
+      if (stage > 3) digitalWrite(vertex2,LOW);
+      if (stage > 4) digitalWrite(vertex1,LOW);
+      if (stage > 5) digitalWrite(beyondRelay,LOW);
+      if (stage > 6) digitalWrite(outerRelay,LOW);
+      if (stage > 7) aw[ledPanels] = 0;
+      if (stage > 9) {
+        sequenceStage++;
+        startTime = timeNow;
+      }
+      if (sequenceStage == 5) {
+        if (progress > slowRandomTriangleFade()) { // if the sequence is "over" then
+          startTime = timeNow;  // reset the time so it continues forever
+        }
+      }
+      return 10000000; // the number of milliseconds this routine is supposed to end at
+    }
+  }
 }
 
 /* SlowRandomTriangleFade();
@@ -514,5 +606,6 @@ long     climacticBuild() {
  Finale Lights ON (VJ needs to flip physical switch) 
  SlowRandomTriangleFade();  (stays on indefinitely) 
  */
+
 
 
