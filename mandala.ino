@@ -34,7 +34,7 @@ unsigned long knobAdder = 0; // used for averaging knob reads
 int knobValue = 0; // what value 0 to 1023 the knob is currently at
 int knobMode = 0;  // which mode we are in right now out of 10 modes
 int oldKnobMode = -1;
-unsigned long startTime, progress; // how far along on the current animation sequence are we compared to millis()
+unsigned long startTime, progress, sequencedTime = 0; // how far along on the current animation sequence are we compared to millis()
 int sequenceStage = 0; // in automated sequence, this stores which stage we're on
 
 /* Timing related variables:  There will be lots of 600 ms delays. I’m trying to anticipate what will look like it is timed to their music. Maybe the delays can be global variables? 
@@ -77,7 +77,7 @@ void loop() {
     break;
   case 2:  // Begin the time counter [starting with] SlowRandomTriangleFade for 10 s
     entireSequence();
-    Serial.print(knobMode);
+    // Serial.print(knobMode); don't do this because it's done in entireSequence()
     break;
   case 3:  // OneTriangleAtaTime, 10s
     oneTriangle();
@@ -192,39 +192,63 @@ void powerInletsOn() { // Turn Power Inlets ON  Low.
 }
 
 void entireSequence() {
-    switch (sequenceStage) {
+  switch (sequenceStage) {
   case 0:
     sequenceStage = 2;  // start the sequence
   case 2:  // Begin the time counter [starting with] SlowRandomTriangleFade for 10 s
-    slowRandomTriangleFade();
+    if (progress > slowRandomTriangleFade()) {
+      startTime = timeNow; // pretend the mode is just starting
+      sequenceStage++; // go to the next stage
+    }
     Serial.print(sequenceStage);
     break;
   case 3:  // OneTriangleAtaTime, 10s
-    oneTriangle();
+    if (progress > oneTriangle()) {
+      startTime = timeNow; // pretend the mode is just starting
+      sequenceStage++; // go to the next stage
+    }
     Serial.print(sequenceStage);
     break;
   case 4:  // TriangleBuild(); 8s
-    triangleBuild();
+    if (progress > triangleBuild()) {
+      startTime = timeNow; // pretend the mode is just starting
+      sequenceStage++; // go to the next stage
+    }
     Serial.print(sequenceStage);
     break;
   case 5:  // InnerOverlay(): 8s
-    innerOverlay();
+    if (progress > innerOverlay()) {
+      startTime = timeNow; // pretend the mode is just starting
+      sequenceStage++; // go to the next stage
+    }
     Serial.print(sequenceStage);
     break;
   case 6:  // VertexSweep(); 6s
-    vertexSweep();
+    if (progress > vertexSweep()) {
+      startTime = timeNow; // pretend the mode is just starting
+      sequenceStage++; // go to the next stage
+    }
     Serial.print(sequenceStage);
     break;
   case 7:  // TriangleBuildFast(); 6s
-    triangleBuildFast();
+    if (progress > triangleBuildFast()) {
+      startTime = timeNow; // pretend the mode is just starting
+      sequenceStage++; // go to the next stage
+    }
     Serial.print(sequenceStage);
     break;
   case 8:  // VertexSweepFast(); 6s
-    vertexSweepFast();
+    if (progress > vertexSweepFast()) {
+      startTime = timeNow; // pretend the mode is just starting
+      sequenceStage++; // go to the next stage
+    }
     Serial.print(sequenceStage);
     break;
   case 9:  // ClimacticBuild(); Let it run as shown in pseudocode. 
-    climacticBuild();
+    if (progress > climacticBuild()) {
+      startTime = timeNow; // pretend the mode is just starting
+      sequenceStage++; // go to the next stage
+    }
     Serial.print(sequenceStage);
     break;
   }
