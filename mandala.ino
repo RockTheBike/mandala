@@ -2,6 +2,7 @@
 
 #define powerInletsBrightness 64 // brightness value of Turn Power Inlets ON  Low. 
 #define ledPanelsLow 64 // brightness value of LED panels are on low
+#define ledPanelsMedium 128 // brightness described in innerOverlay()
 #define slowRandomMedium 128 // medium brightness described in slowRandomTriangleFade()
 #define slowRandomLow 32 // low brightness described in slowRandomTriangleFade()
 
@@ -340,8 +341,41 @@ long     triangleBuildFast() {//  Same as Triangle build but all delays are halv
   return 6000; // the number of milliseconds this routine is supposed to end at
 }
 
-long     innerOverlay() {
-  return 10000; // the number of milliseconds this routine is supposed to end at  
+long innerOverlay() {
+/* LED panels on medium
+ Turn on Triangle 1 and Vertex 1 at the same time. Delay 600ms
+ ON Triangle2 and Vertex2
+ Triangle3 and Vertex3
+ Triangle4 and Vertex4
+ ON Vertex 5 and CrissCross:
+ At this point all lights in the mandala are ON. Make LED panels bright. 
+ delay 1000ms
+ repeat */
+  int stage = (progress % 4000) / 600;
+  if (stage == 0) allOff(); // if it's the beginning of the sequence
+  aw[ledPanels] = ledPanelsMedium; // except the panels are medium
+  aw[triangle1] = 255; // and the triangle
+  digitalWrite(vertex1,HIGH); // and vertex1 are on
+  if (stage > 0) {
+    aw[triangle2] = 255;
+    digitalWrite(vertex2,HIGH);
+  }
+  if (stage > 1) {
+    aw[triangle3] = 255;
+    digitalWrite(vertex3,HIGH);
+  }
+  if (stage > 2) {
+    aw[triangle4] = 255;
+    digitalWrite(vertex4,HIGH);
+  }
+  if (stage > 3) {
+    digitalWrite(vertex5,HIGH);
+    digitalWrite(crissCross,HIGH);
+  }
+  if (stage > 4) {
+      aw[ledPanels] = 255;
+  }
+  return 8000; // the number of milliseconds this routine is supposed to end at
 }
 
 long     vertexSweep() {
