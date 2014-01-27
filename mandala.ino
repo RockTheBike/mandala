@@ -75,7 +75,7 @@ void loop() {
     powerInletsOn();  
     Serial.print(knobMode);
     break;
-  case 2:  // Begin the time counter and do SlowRandomTriangleFade for 10 s
+  case 2:  // Begin the time counter [starting with] SlowRandomTriangleFade for 10 s
     entireSequence();
     Serial.print(knobMode);
     break;
@@ -128,8 +128,8 @@ void loop() {
  9. ClimacticBuild (); Let it run as shown in pseudocode. 
  */
 
-void updateAnalogWrites() {
-    if (aw[1] != oldAw[1]) {
+void updateAnalogWrites() { // set analogWrite only when value has changed
+  if (aw[1] != oldAw[1]) { // you can't just analogWrite all the damn time
     oldAw[1] = aw[1];  // update our knowledge of its status
     analogWrite(pin[1],aw[1]); // set the analogWrite value
   }
@@ -192,11 +192,47 @@ void powerInletsOn() { // Turn Power Inlets ON  Low.
 }
 
 void entireSequence() {
-
+    switch (sequenceStage) {
+  case 0:
+    sequenceStage = 2;  // start the sequence
+  case 2:  // Begin the time counter [starting with] SlowRandomTriangleFade for 10 s
+    slowRandomTriangleFade();
+    Serial.print(sequenceStage);
+    break;
+  case 3:  // OneTriangleAtaTime, 10s
+    oneTriangle();
+    Serial.print(sequenceStage);
+    break;
+  case 4:  // TriangleBuild(); 8s
+    triangleBuild();
+    Serial.print(sequenceStage);
+    break;
+  case 5:  // InnerOverlay(): 8s
+    innerOverlay();
+    Serial.print(sequenceStage);
+    break;
+  case 6:  // VertexSweep(); 6s
+    vertexSweep();
+    Serial.print(sequenceStage);
+    break;
+  case 7:  // TriangleBuildFast(); 6s
+    triangleBuildFast();
+    Serial.print(sequenceStage);
+    break;
+  case 8:  // VertexSweepFast(); 6s
+    vertexSweepFast();
+    Serial.print(sequenceStage);
+    break;
+  case 9:  // ClimacticBuild(); Let it run as shown in pseudocode. 
+    climacticBuild();
+    Serial.print(sequenceStage);
+    break;
+  }
+  
 
 }
 
-void slowRandomTriangleFade() {
+long slowRandomTriangleFade() {
   /* SlowRandomTriangleFade();
    LED Panels OFF
    Triangles fade from  OFF-low - medium-low-OFF  at random with
@@ -217,9 +253,10 @@ void slowRandomTriangleFade() {
 
   
   }
+  return 10000; // the number of milliseconds this routine is supposed to end at
 }
 
-void oneTriangle() {
+long oneTriangle() {
 /* OneTriangleAtaTime();
  LED panels are on low 
  Fade in Triangle 1 to full brightness over 300ms. Leave on for 600ms. Fade out over 300ms. Pause for 600ms.
@@ -239,24 +276,31 @@ void oneTriangle() {
   if ((progress >= 256) && (progress < 856)) digitalWrite(triangle1,HIGH);
   if ((progress >= 856) && (progress < 1112)) analogWrite(triangle1,255 - (progress - 856));
   if ((progress >= 1112) && (progress < 1112))
+  return 10000; // the number of milliseconds this routine is supposed to end at  
 }
 
-void triangleBuild() {
+long triangleBuild() {
+  return 10000; // the number of milliseconds this routine is supposed to end at  
 }
 
-void     innerOverlay() {
+long     innerOverlay() {
+  return 10000; // the number of milliseconds this routine is supposed to end at  
 }
 
-void     vertexSweep() {
+long     vertexSweep() {
+  return 10000; // the number of milliseconds this routine is supposed to end at  
 }
 
-void     triangleBuildFast() {
+long     triangleBuildFast() {
+  return 10000; // the number of milliseconds this routine is supposed to end at  
 }
 
-void     vertexSweepFast() {
+long     vertexSweepFast() {
+  return 10000; // the number of milliseconds this routine is supposed to end at  
 }
 
-void     climacticBuild() {
+long     climacticBuild() {
+  return 10000; // the number of milliseconds this routine is supposed to end at  
 }
 
 /* SlowRandomTriangleFade();
