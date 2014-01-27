@@ -64,7 +64,7 @@ void loop() {
   knobAdder = 0;
   for (int i=0; i < knobReads; i++) knobAdder += analogRead(knobPin); // averaged value over a bunch of reads
   knobValue = knobAdder / knobReads; // knobValue will be 0 to 1023
-  knobMode = knobValue / 102;  // knobMode will be 0 through 9
+  knobMode = knobValue / 103;  // knobMode will be 0 through 9
   if (knobMode != oldKnobMode) {  // if we have changed modes from last time
     Serial.print("switched to mode "); // Debug CODE:  Please print out to the
     Serial.println(knobMode); // Serial monitor what Light Function is currently running
