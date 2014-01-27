@@ -275,7 +275,7 @@ long slowRandomTriangleFade() {
     if (triangleProgress < 600)
       aw[triangle[tri]] = slowRandomLow + (int)((float)triangleProgress / (600.0 / (slowRandomMedium - slowRandomLow)));
     if ((triangleProgress >= 600) && (triangleProgress < 1200))
-      aw[triangle[tri]] = slowRandomMedium - slowRandomLow + (int)((float)(triangleProgress - 600) / (600.0 / (slowRandomMedium - slowRandomLow)));
+      aw[triangle[tri]] = slowRandomMedium - slowRandomLow + (int)((float)(triangleProgress - 600.0) / (600.0 / (slowRandomMedium - slowRandomLow)));
     if (triangleProgress >= 1200) aw[triangle[tri]] = 0;  // Pause for 800ms.
   }  // maybe that will work, i don't know.
   return 10000; // the number of milliseconds this routine is supposed to end at
@@ -298,7 +298,7 @@ long oneTriangle() {
   if ((triangleProgress >= 900) && (triangleProgress < 1200)) aw[whichTriangle] = 255 - (int)((float)(triangleProgress - 900) / 1.178);  // Fade out over 300ms
   if (triangleProgress >= 1200) aw[whichTriangle] = 0;  // Pause for 600ms.
 
-  return 1800*4; // the number of milliseconds this routine is supposed to end at  
+  return 10000; // the number of milliseconds this routine is supposed to end at
 }
 
 long triangleBuild() {
@@ -321,7 +321,7 @@ long triangleBuild() {
   if ((triangleProgress >= 2600) && (triangleProgress < 2700)) aw[triangle[(buildOrder +1) % 4]] = 255 - (triangleProgress - 2600) * 2.575; // turn off in 100ms
   if ((triangleProgress >= 3200) && (triangleProgress < 3300)) aw[triangle[(buildOrder +2) % 4]] = 255 - (triangleProgress - 3200) * 2.575; // turn off in 100ms
   if ((triangleProgress >= 3800) && (triangleProgress < 3900)) aw[triangle[(buildOrder +3) % 4]] = 255 - (triangleProgress - 3800) * 2.575; // turn off in 100ms
-  return 10000; // the number of milliseconds this routine is supposed to end at  
+  return 8000; // the number of milliseconds this routine is supposed to end at
 }
 
 long     triangleBuildFast() {//  Same as Triangle build but all delays are halved.
@@ -337,7 +337,7 @@ long     triangleBuildFast() {//  Same as Triangle build but all delays are halv
   if ((triangleProgress >= 2600) && (triangleProgress < 2700)) aw[triangle[(buildOrder +1) % 4]] = 255 - (triangleProgress - 2600) * 2.575; // turn off in 100ms
   if ((triangleProgress >= 3200) && (triangleProgress < 3300)) aw[triangle[(buildOrder +2) % 4]] = 255 - (triangleProgress - 3200) * 2.575; // turn off in 100ms
   if ((triangleProgress >= 3800) && (triangleProgress < 3900)) aw[triangle[(buildOrder +3) % 4]] = 255 - (triangleProgress - 3800) * 2.575; // turn off in 100ms
-  return 10000; // the number of milliseconds this routine is supposed to end at  
+  return 6000; // the number of milliseconds this routine is supposed to end at
 }
 
 long     innerOverlay() {
@@ -353,7 +353,7 @@ long     vertexSweepFast() {
 }
 
 long     climacticBuild() {
-  return 10000; // the number of milliseconds this routine is supposed to end at  
+  return 10000000; // the number of milliseconds this routine is supposed to end at
 }
 
 /* SlowRandomTriangleFade();
