@@ -268,7 +268,7 @@ long slowRandomTriangleFade() {
    a low-medium-low fade. This takes 2 s per triangle. Stagger
    them and begin them at random so that some are increasing and
    some are decreasing at the same time. */
-  digitalWrite(pin[ledPanels],LOW);
+  aw[ledPanels] = 0;
   for (int tri = 0; tri < 4; tri++) {
     unsigned long triangleProgress = (progress + fadeRandom[triangle[tri]]) % 2000;  // 2000 ms cycle looped at random
     if (triangleProgress < 600)
