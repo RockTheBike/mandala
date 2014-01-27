@@ -2,6 +2,8 @@
 
 #define powerInletsBrightness 64 // brightness value of Turn Power Inlets ON  Low. 
 #define ledPanelsLow 64 // brightness value of LED panels are on low
+#define slowRandomMedium 128 // medium brightness described in slowRandomTriangleFade()
+#define slowRandomLow 32 // low brightness described in slowRandomTriangleFade()
 
 // THESE ARE INDEX NUMBERS NOT PIN NUMBERS
 #define outerRelay  0
@@ -25,6 +27,8 @@
 int pin[PINS] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, A1, A2, A3};
 int aw[8] = {0}; // what analogWrite value to put
 int oldAw[8] = {-1}; // last value
+int fadeRandom[8]; // for random fading in slowRandomTriangleFade()
+int triangle[4] = {triangle1, triangle2, triangle3, triangle4};
 
 #define knobPin     A5  // the 
 
@@ -42,10 +46,15 @@ int sequenceStage = 0; // in automated sequence, this stores which stage we're o
 unsigned long timeNow;
 
 void setup() {
+  randomSeed(analogRead(A3));
   for (int i=0; i < PINS; i++) pinMode(pin[i], OUTPUT);
   Serial.begin(57600);
   Serial.println("mandala arbduino program");
   startTime = millis();
+  fadeRandom[triangle1] = random(2000);
+  fadeRandom[triangle2] = random(2000);
+  fadeRandom[triangle3] = random(2000);
+  fadeRandom[triangle4] = random(2000);
 }
 
 void loop() {
@@ -260,19 +269,14 @@ long slowRandomTriangleFade() {
    them and begin them at random so that some are increasing and
    some are decreasing at the same time. */
   digitalWrite(pin[ledPanels],LOW);
-
-
-  if (progress < 2000) {
-    int fade = progress / ( 800 / 64); // first 800ms is off to low
-    aw[triangle1 = fade;  // how to do an analogWrite
-    analogWrite(pin[triangle2,fade);
-    analogWrite(pin[triangle3,fade);
-    analogWrite(pin[triangle4,fade);
-  }
-  if ((progress >= 800) && (progress < 2800)) {
-
-  
-  }
+  for (int tri = 0; tri < 4; tri++) {
+    unsigned long triangleProgress = (progress + fadeRandom[triangle[tri]]) % 2000;  // 2000 ms cycle looped at random
+    if (triangleProgress < 600)
+      aw[triangle[tri]] = slowRandomLow + (int)((float)triangleProgress / (600.0 / (slowRandomMedium - slowRandomLow)));
+    if ((triangleProgress >= 600) && (triangleProgress < 1200))
+      aw[triangle[tri]] = slowRandomMedium - slowRandomLow + (int)((float)(triangleProgress - 600) / (600.0 / (slowRandomMedium - slowRandomLow)));
+    if (triangleProgress >= 1200) aw[triangle[tri]] = 0;  // Pause for 800ms.
+  }  // maybe that will work, i don't know.
   return 10000; // the number of milliseconds this routine is supposed to end at
 }
 
