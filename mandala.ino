@@ -40,6 +40,7 @@ int knobMode = 0;  // which mode we are in right now out of 10 modes
 int oldKnobMode = -1;
 unsigned long startTime, progress = 0; // how far along on the current animation sequence are we compared to millis()
 int sequenceStage = 0; // in automated sequence, this stores which stage we're on
+int buildOrder = 0;  // which triangle to start with in triangleBuild()
 
 /* Timing related variables:  There will be lots of 600 ms delays. I’m trying to anticipate what will look like it is timed to their music. Maybe the delays can be global variables? 
  I would like to have a single global scalar variable that makes things run faster or slower. Like “Time Fudge Factor”. */
@@ -282,7 +283,6 @@ long slowRandomTriangleFade() {
 
 long oneTriangle() {
 /* OneTriangleAtaTime();
- LED panels are on low 
  Fade in Triangle 1 to full brightness over 300ms. Leave on for 600ms. Fade out over 300ms. Pause for 600ms.
  Repeat for Triangle 2, 3, 4. */
   aw[ledPanels] = ledPanelsLow; //   LED panels are on low 
@@ -302,6 +302,41 @@ long oneTriangle() {
 }
 
 long triangleBuild() {
+/* Whenever you turn on a triangle, do so with PWM fade from OFF-BRIGHT over the course of 100ms. Ditto with turning off a triangle.
+ Turn on Triangle 1, then 2, then 3, then 4, with 600ms delay.
+ When all are ON, make LED panels bright. When you start turning them OFF make LED panels low again. This is to send a pulse of LED to wash over the pedalers at this mini peak.
+ Turn them OFF in the same order (1, then 2, then 3, then 4).
+ Start again, but with Triangle 2 as the first one. So it would be Triangle, 2, 3, 4, 1 (with 600ms delay) then OFF in that order.
+ Then do it again with Triangle 3 as the first one, and so forth.
+*/
+  aw[ledPanels] = ledPanelsLow; //   LED panels are on low [unless made bright]
+  long triangleProgress = progress % 4000; // how far into this build are we
+  buildOrder = progress / 4000;
+  if (triangleProgress < 100) aw[triangle[buildOrder % 4]] = triangleProgress * 2.575; // turn on in 100ms
+  if ((triangleProgress >= 600) && (triangleProgress < 700)) aw[triangle[(buildOrder +1) % 4]] = (triangleProgress - 600) * 2.575; // turn on in 100ms
+  if ((triangleProgress >= 1200) && (triangleProgress < 1300)) aw[triangle[(buildOrder +2) % 4]] = (triangleProgress - 1200) * 2.575; // turn on in 100ms
+  if ((triangleProgress >= 1800) && (triangleProgress < 1900)) aw[triangle[(buildOrder  +3) % 4]] = (triangleProgress - 1800) * 2.575; // turn on in 100ms
+  if ((triangleProgress >= 1900) && (triangleProgress < 2000)) aw[ledPanels] = 255;  // When all are ON, make LED panels bright.
+  if ((triangleProgress >= 2000) && (triangleProgress < 2100)) aw[triangle[(buildOrder % 4)]] = 255 - (triangleProgress - 2000) * 2.575; // turn off in 100ms
+  if ((triangleProgress >= 2600) && (triangleProgress < 2700)) aw[triangle[(buildOrder +1) % 4]] = 255 - (triangleProgress - 2600) * 2.575; // turn off in 100ms
+  if ((triangleProgress >= 3200) && (triangleProgress < 3300)) aw[triangle[(buildOrder +2) % 4]] = 255 - (triangleProgress - 3200) * 2.575; // turn off in 100ms
+  if ((triangleProgress >= 3800) && (triangleProgress < 3900)) aw[triangle[(buildOrder +3) % 4]] = 255 - (triangleProgress - 3800) * 2.575; // turn off in 100ms
+  return 10000; // the number of milliseconds this routine is supposed to end at  
+}
+
+long     triangleBuildFast() {//  Same as Triangle build but all delays are halved.
+  aw[ledPanels] = ledPanelsLow; //   LED panels are on low [unless made bright]
+  long triangleProgress = (progress *2) % 4000; // how far into this build are we
+  buildOrder = progress / 8000; // this line and above are only differences from triangleBuild() !!!!!!!!!!!!!!!
+  if (triangleProgress < 100) aw[triangle[buildOrder % 4]] = triangleProgress * 2.575; // turn on in 100ms
+  if ((triangleProgress >= 600) && (triangleProgress < 700)) aw[triangle[(buildOrder +1) % 4]] = (triangleProgress - 600) * 2.575; // turn on in 100ms
+  if ((triangleProgress >= 1200) && (triangleProgress < 1300)) aw[triangle[(buildOrder +2) % 4]] = (triangleProgress - 1200) * 2.575; // turn on in 100ms
+  if ((triangleProgress >= 1800) && (triangleProgress < 1900)) aw[triangle[(buildOrder  +3) % 4]] = (triangleProgress - 1800) * 2.575; // turn on in 100ms
+  if ((triangleProgress >= 1900) && (triangleProgress < 2000)) aw[ledPanels] = 255;  // When all are ON, make LED panels bright.
+  if ((triangleProgress >= 2000) && (triangleProgress < 2100)) aw[triangle[(buildOrder % 4)]] = 255 - (triangleProgress - 2000) * 2.575; // turn off in 100ms
+  if ((triangleProgress >= 2600) && (triangleProgress < 2700)) aw[triangle[(buildOrder +1) % 4]] = 255 - (triangleProgress - 2600) * 2.575; // turn off in 100ms
+  if ((triangleProgress >= 3200) && (triangleProgress < 3300)) aw[triangle[(buildOrder +2) % 4]] = 255 - (triangleProgress - 3200) * 2.575; // turn off in 100ms
+  if ((triangleProgress >= 3800) && (triangleProgress < 3900)) aw[triangle[(buildOrder +3) % 4]] = 255 - (triangleProgress - 3800) * 2.575; // turn off in 100ms
   return 10000; // the number of milliseconds this routine is supposed to end at  
 }
 
@@ -310,10 +345,6 @@ long     innerOverlay() {
 }
 
 long     vertexSweep() {
-  return 10000; // the number of milliseconds this routine is supposed to end at  
-}
-
-long     triangleBuildFast() {
   return 10000; // the number of milliseconds this routine is supposed to end at  
 }
 
